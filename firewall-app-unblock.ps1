@@ -79,7 +79,7 @@ try {
     rule_inbound=$RuleInbound
     rule_outbound=$RuleOutbound
     status=$status
-    copilot_soar = $true
+    copilot_action = $true
   }
   $logObj | ConvertTo-Json -Compress | Out-File -FilePath $ARLog -Append -Encoding ascii -Width 2000
   Write-Log "JSON appended to $ARLog" 'INFO'
@@ -91,10 +91,11 @@ try {
     action="unblock_app"
     status="error"
     error=$_.Exception.Message
-    copilot_soar = $true
+    copilot_action = $true
   }
   $logObj | ConvertTo-Json -Compress | Out-File -FilePath $ARLog -Append -Encoding ascii -Width 2000
 } finally {
   $dur=[int]((Get-Date)-$runStart).TotalSeconds
   Write-Log "=== SCRIPT END : duration ${dur}s ==="
 }
+
