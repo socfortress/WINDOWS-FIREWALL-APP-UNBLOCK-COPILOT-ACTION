@@ -1,0 +1,39 @@
+{
+  "active_response_name": "WINDOWS-FIREWALL-APP-UNBLOCK-ACTIVERESPONSE",
+  "description": "Removes previously created Windows Firewall rules that were blocking a specific application. Accepts the application name used during blocking and deletes the associated inbound and outbound rules. Logs all actions and outputs a JSON report for SOC automation.",
+  "technology": "Windows",
+  "icon": "windows",
+  "script_parameters": [
+    {
+      "name": "MaxWaitSeconds",
+      "type": "integer",
+      "required": false,
+      "description": "Maximum wait time for the script execution. Defaults to 300 seconds.",
+      "default": 300
+    },
+    {
+      "name": "LogPath",
+      "type": "string",
+      "required": false,
+      "description": "Path to the rotating human-readable script log.",
+      "default": "%TEMP%/UnblockApp-script.log"
+    },
+    {
+      "name": "ARLog",
+      "type": "string",
+      "required": false,
+      "description": "Path where the active response JSON result will be stored. Uses overwrite-safe NDJSON logging.",
+      "default": "C:\\Program Files (x86)\\ossec-agent\\active-response\\active-responses.log"
+    }
+  ],
+  "user_prompts": [
+    {
+      "prompt": "Enter the application name used during blocking",
+      "description": "Application name originally provided when creating the block rule. Required to identify and remove the associated firewall rules."
+    }
+  ],
+  "repo_url": "https://github.com/socfortress/WINDOWS-FIREWALL-APP-UNBLOCK-ACTIVERESPONSE",
+  "script_name": "firewall-app-unblock.ps1",
+  "version": "1.0.0",
+  "last_updated": "2025-08-22T00:00:00Z"
+}
