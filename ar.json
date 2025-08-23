@@ -1,5 +1,5 @@
 {
-  "copilot_action_name": "WINDOWS-FIREWALL-APP-UNBLOCK-ACTIVERESPONSE",
+  "copilot_action_name": "WINDOWS-FIREWALL-APP-UNBLOCK-COPILOT-ACTION",
   "description": "Removes previously created Windows Firewall rules that were blocking a specific application. Accepts the application name used during blocking and deletes the associated inbound and outbound rules. Logs all actions and outputs a JSON report for SOC automation.",
   "technology": "Windows",
   "icon": "windows",
