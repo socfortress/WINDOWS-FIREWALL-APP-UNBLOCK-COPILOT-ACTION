@@ -32,7 +32,7 @@
       "description": "Application name originally provided when creating the block rule. Required to identify and remove the associated firewall rules."
     }
   ],
-  "repo_url": "https://raw.githubusercontent.com/socfortress/WINDOWS-FIREWALL-APP-UNBLOCK-COPILOT-ACTION/refs/heads/main/",
+  "repo_url": "https://raw.githubusercontent.com/socfortress/WINDOWS-FIREWALL-APP-UNBLOCK-COPILOT-ACTION/refs/heads/main",
   "script_name": "firewall-app-unblock.ps1",
   "version": "1.0.0",
   "last_updated": "2025-08-22T00:00:00Z"
