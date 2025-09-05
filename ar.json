@@ -5,6 +5,13 @@
   "icon": "windows",
   "script_parameters": [
     {
+      "name": "app name",
+      "type": "string",
+      "required": true,
+      "description": "application name or path.",
+      "arg_position" : "1"
+    },
+    {
       "name": "MaxWaitSeconds",
       "type": "integer",
       "required": false,
