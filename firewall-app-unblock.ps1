@@ -1,7 +1,6 @@
 [CmdletBinding()]
 param(
   [string]$AppName,
-  [string]$Arg1,
   [int]$MaxWaitSeconds=300,
   [string]$LogPath="$env:TEMP\UnblockApp-script.log",
   [string]$ARLog='C:\Program Files (x86)\ossec-agent\active-response\active-responses.log'
@@ -15,6 +14,8 @@ $runStart=Get-Date
 
 if (-not $AppName -and $Arg1)     { $AppName = $Arg1 }
 if (-not $AppName -and $env:ARG1) { $AppName = $env:ARG1 }
+
+if (-not $AppName) { throw "AppName is required (set -AppName, caller `$Arg1, or `$env:ARG1)" }
 
 function Write-Log {
   param([string]$Message,[ValidateSet('INFO','WARN','ERROR','DEBUG')]$Level='INFO')
@@ -167,5 +168,6 @@ finally {
   $dur=[int]((Get-Date)-$runStart).TotalSeconds
   Write-Log "=== SCRIPT END : duration ${dur}s ==="
 }
+
 
 
