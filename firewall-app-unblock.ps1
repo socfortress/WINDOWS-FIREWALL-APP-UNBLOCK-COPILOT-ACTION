@@ -13,7 +13,8 @@ $LogMaxKB=100
 $LogKeep=5
 $runStart=Get-Date
 
-if ($Arg1 -and -not $AppName) { $AppName = $Arg1 }
+if (-not $AppName -and $Arg1)     { $AppName = $Arg1 }
+if (-not $AppName -and $env:ARG1) { $AppName = $env:ARG1 
 
 function Write-Log {
   param([string]$Message,[ValidateSet('INFO','WARN','ERROR','DEBUG')]$Level='INFO')
@@ -166,3 +167,4 @@ finally {
   $dur=[int]((Get-Date)-$runStart).TotalSeconds
   Write-Log "=== SCRIPT END : duration ${dur}s ==="
 }
+
