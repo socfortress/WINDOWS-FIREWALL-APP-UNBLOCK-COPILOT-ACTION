@@ -8,7 +8,7 @@
       "name": "app name",
       "type": "string",
       "required": true,
-      "description": "application name or path.",
+      "description": "⚠️ Application name or full file path. IMPORTANT: Windows paths must be written with double backslashes (\\). Example: C:\\Users\\user\\Desktop\\Test.exe",
       "arg_position" : "1"
     },
   ],
