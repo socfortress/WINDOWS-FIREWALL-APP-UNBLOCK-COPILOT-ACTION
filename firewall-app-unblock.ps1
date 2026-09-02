@@ -73,66 +73,193 @@ try {
   $removedIn=$false
   $removedOut=$false
 
-  $ruleIn=Get-NetFirewallRule -DisplayName $RuleInbound -ErrorAction SilentlyContinue
-  if($ruleIn){
-    Remove-NetFirewallRule -DisplayName $RuleInbound
-    $removedIn=$true
-    $lines += ([pscustomobject]@{
-      timestamp      = $ts
-      host           = $HostName
-      action         = 'unblock_app'
-      copilot_action = $true
-      type           = 'rule_removed'
-      direction      = 'inbound'
-      display_name   = $RuleInbound
-    } | ConvertTo-Json -Compress -Depth 4)
-  } else {
-    $lines += ([pscustomobject]@{
-      timestamp      = $ts
-      host           = $HostName
-      action         = 'unblock_app'
-      copilot_action = $true
-      type           = 'rule_missing'
-      direction      = 'inbound'
-      display_name   = $RuleInbound
-    } | ConvertTo-Json -Compress -Depth 4)
+  $UseNetSecurity = [bool](Get-Command Get-NetFirewallRule -ErrorAction SilentlyContinue)
+
+  if ($UseNetSecurity) {
+
+      # Modern Windows - existing NetSecurity implementation
+
+      $ruleIn = Get-NetFirewallRule -DisplayName $RuleInbound -ErrorAction SilentlyContinue
+
+      if ($ruleIn) {
+
+          Remove-NetFirewallRule -DisplayName $RuleInbound
+          $removedIn = $true
+
+          $lines += ([pscustomobject]@{
+              timestamp      = $ts
+              host           = $HostName
+              action         = 'unblock_app'
+              copilot_action = $true
+              type           = 'rule_removed'
+              direction      = 'inbound'
+              display_name   = $RuleInbound
+          } | ConvertTo-Json -Compress -Depth 4)
+
+      } else {
+
+          $lines += ([pscustomobject]@{
+              timestamp      = $ts
+              host           = $HostName
+              action         = 'unblock_app'
+              copilot_action = $true
+              type           = 'rule_missing'
+              direction      = 'inbound'
+              display_name   = $RuleInbound
+          } | ConvertTo-Json -Compress -Depth 4)
+      }
+
+
+      $ruleOut = Get-NetFirewallRule -DisplayName $RuleOutbound -ErrorAction SilentlyContinue
+
+      if ($ruleOut) {
+
+          Remove-NetFirewallRule -DisplayName $RuleOutbound
+          $removedOut = $true
+
+          $lines += ([pscustomobject]@{
+              timestamp      = $ts
+              host           = $HostName
+              action         = 'unblock_app'
+              copilot_action = $true
+              type           = 'rule_removed'
+              direction      = 'outbound'
+              display_name   = $RuleOutbound
+          } | ConvertTo-Json -Compress -Depth 4)
+
+      } else {
+
+          $lines += ([pscustomobject]@{
+              timestamp      = $ts
+              host           = $HostName
+              action         = 'unblock_app'
+              copilot_action = $true
+              type           = 'rule_missing'
+              direction      = 'outbound'
+              display_name   = $RuleOutbound
+          } | ConvertTo-Json -Compress -Depth 4)
+      }
+
   }
-  $ruleOut=Get-NetFirewallRule -DisplayName $RuleOutbound -ErrorAction SilentlyContinue
-  if($ruleOut){
-    Remove-NetFirewallRule -DisplayName $RuleOutbound
-    $removedOut=$true
-    $lines += ([pscustomobject]@{
-      timestamp      = $ts
-      host           = $HostName
-      action         = 'unblock_app'
-      copilot_action = $true
-      type           = 'rule_removed'
-      direction      = 'outbound'
-      display_name   = $RuleOutbound
-    } | ConvertTo-Json -Compress -Depth 4)
-  } else {
-    $lines += ([pscustomobject]@{
-      timestamp      = $ts
-      host           = $HostName
-      action         = 'unblock_app'
-      copilot_action = $true
-      type           = 'rule_missing'
-      direction      = 'outbound'
-      display_name   = $RuleOutbound
-    } | ConvertTo-Json -Compress -Depth 4)
+  else {
+
+      # Legacy Windows - Windows Firewall COM API
+
+      $FirewallPolicy = New-Object -ComObject HNetCfg.FwPolicy2
+
+
+      # INBOUND
+
+      $ruleIn = $null
+
+      try {
+          $ruleIn = $FirewallPolicy.Rules.Item($RuleInbound)
+      }
+      catch {
+          $ruleIn = $null
+      }
+
+      if ($ruleIn) {
+
+          $FirewallPolicy.Rules.Remove($RuleInbound)
+          $removedIn = $true
+
+          $lines += ([pscustomobject]@{
+              timestamp      = $ts
+              host           = $HostName
+              action         = 'unblock_app'
+              copilot_action = $true
+              type           = 'rule_removed'
+              direction      = 'inbound'
+              display_name   = $RuleInbound
+          } | ConvertTo-Json -Compress -Depth 4)
+
+      } else {
+
+          $lines += ([pscustomobject]@{
+              timestamp      = $ts
+              host           = $HostName
+              action         = 'unblock_app'
+              copilot_action = $true
+              type           = 'rule_missing'
+              direction      = 'inbound'
+              display_name   = $RuleInbound
+          } | ConvertTo-Json -Compress -Depth 4)
+      }
+
+
+      # OUTBOUND
+
+      $ruleOut = $null
+
+      try {
+          $ruleOut = $FirewallPolicy.Rules.Item($RuleOutbound)
+      }
+      catch {
+          $ruleOut = $null
+      }
+
+      if ($ruleOut) {
+
+          $FirewallPolicy.Rules.Remove($RuleOutbound)
+          $removedOut = $true
+
+          $lines += ([pscustomobject]@{
+              timestamp      = $ts
+              host           = $HostName
+              action         = 'unblock_app'
+              copilot_action = $true
+              type           = 'rule_removed'
+              direction      = 'outbound'
+              display_name   = $RuleOutbound
+          } | ConvertTo-Json -Compress -Depth 4)
+
+      } else {
+
+          $lines += ([pscustomobject]@{
+              timestamp      = $ts
+              host           = $HostName
+              action         = 'unblock_app'
+              copilot_action = $true
+              type           = 'rule_missing'
+              direction      = 'outbound'
+              display_name   = $RuleOutbound
+          } | ConvertTo-Json -Compress -Depth 4)
+      }
   }
+
+
+  # Verify both rules were removed
+
   foreach ($rn in @($RuleOutbound, $RuleInbound)) {
-    $r = Get-NetFirewallRule -DisplayName $rn -ErrorAction SilentlyContinue
-    $lines += ([pscustomobject]@{
-      timestamp      = $ts
-      host           = $HostName
-      action         = 'unblock_app'
-      copilot_action = $true
-      type           = 'verify_rule'
-      display_name   = $rn
-      exists         = [bool]$r
-      enabled        = if ($r) { [bool]$r.Enabled } else { $false }
-    } | ConvertTo-Json -Compress -Depth 4)
+
+      if ($UseNetSecurity) {
+
+          $r = Get-NetFirewallRule -DisplayName $rn -ErrorAction SilentlyContinue
+
+      }
+      else {
+
+          $r = $null
+
+          try {
+              $r = $FirewallPolicy.Rules.Item($rn)
+          }
+          catch {
+              $r = $null
+          }
+      }
+
+      $lines += ([pscustomobject]@{
+          timestamp      = $ts
+          host           = $HostName
+          action         = 'unblock_app'
+          copilot_action = $true
+          type           = 'verify_rule'
+          display_name   = $rn
+          exists         = [bool]$r
+          enabled        = if ($r) { [bool]$r.Enabled } else { $false }
+      } | ConvertTo-Json -Compress -Depth 4)
   }
 
   # Summary always first
@@ -172,7 +299,3 @@ finally {
   $dur=[int]((Get-Date)-$runStart).TotalSeconds
   Write-Log "=== SCRIPT END : duration ${dur}s ==="
 }
-
-
-
-
